@@ -1,3 +1,7 @@
+
+onsole.log("✅ script.js loaded");
+alert("✅ script.js loaded");
+
 const calendarEl = document.getElementById("calendar");
 const monthLabel = document.getElementById("monthLabel");
 const inOfficeCountEl = document.getElementById("inOfficeCount");
