@@ -11,7 +11,7 @@ const WEEKLY_TARGET = 3;
 
 const LABELS = {
   office: "In Office",
-  wfh: "WFH",
+  home: "Home",
   pto: "PTO",
   wfa: "WFA"
 };
@@ -44,9 +44,9 @@ function renderCalendar() {
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
   let inOffice = 0;
-  let totalPossibleWeekdays = 0;
+  let possibleDays = 0;
 
-  // spacer cells before first weekday
+  // spacer cells
   for (let i = 0; i < firstDayOfMonth; i++) {
     calendarEl.appendChild(document.createElement("div"));
   }
@@ -66,26 +66,28 @@ function renderCalendar() {
       continue;
     }
 
-    // Weekday
-    totalPossibleWeekdays++;
+    // DEFAULT VALUE = Home
+    const state = data[dateKey] || "home";
 
-    // DEFAULT VALUE = WFH
-    const state = data[dateKey] || "wfh";
+    // Count possible days (exclude PTO and WFA)
+    if (state !== "pto" && state !== "wfa") {
+      possibleDays++;
+    }
 
     // Count in-office
     if (state === "office") {
       inOffice++;
     }
 
-    // Style only non-default states
-    if (state !== "wfh") {
+    // Apply color only if not default Home
+    if (state !== "home") {
       div.classList.add(state);
     }
 
     const select = document.createElement("select");
     select.innerHTML = `
       <option value="office">In Office</option>
-      <option value="wfh">WFH</option>
+      <option value="home">Home</option>
       <option value="pto">PTO</option>
       <option value="wfa">WFA</option>
     `;
@@ -102,31 +104,20 @@ function renderCalendar() {
     calendarEl.appendChild(div);
   }
 
-  // monthly target based on total weekdays
+  // Monthly target based on possible days only
   const monthlyTargetDays = Math.ceil(
-    (totalPossibleWeekdays / 5) * WEEKLY_TARGET
+    (possibleDays / 5) * WEEKLY_TARGET
   );
 
   const daysNeeded = Math.max(monthlyTargetDays - inOffice, 0);
 
   inOfficeCountEl.textContent = inOffice;
-  possibleDaysEl.textContent = totalPossibleWeekdays;
+  possibleDaysEl.textContent = possibleDays;
   daysNeededEl.textContent = daysNeeded;
 
   attendanceScoreEl.textContent =
-    totalPossibleWeekdays > 0
-      ? ((inOffice / totalPossibleWeekdays) * 5).toFixed(2)
+    possibleDays > 0
+      ? ((inOffice / possibleDays) * 5).toFixed(2)
       : "0";
 }
 
-document.getElementById("prevMonth").onclick = () => {
-  currentDate.setMonth(currentDate.getMonth() - 1);
-  renderCalendar();
-};
-
-document.getElementById("nextMonth").onclick = () => {
-  currentDate.setMonth(currentDate.getMonth() + 1);
-  renderCalendar();
-};
-
-renderCalendar();
