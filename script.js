@@ -3,27 +3,30 @@ const monthLabel = document.getElementById("monthLabel");
 const inOfficeCountEl = document.getElementById("inOfficeCount");
 const possibleDaysEl = document.getElementById("possibleDays");
 const attendanceScoreEl = document.getElementById("attendanceScore");
+const daysNeededEl = document.getElementById("daysNeeded");
 
 let currentDate = new Date();
 
 const STATES = ["office", "wfh", "pto", "wfa"];
-const STATE_LABELS = {
+const LABELS = {
   office: "In Office",
   wfh: "WFH",
   pto: "PTO",
   wfa: "WFA"
 };
 
-function getStorageKey(date) {
-  return `attendance-${date.getFullYear()}-${date.getMonth()}`;
+const WEEKLY_TARGET = 3;
+
+function storageKey() {
+  return `attendance-${currentDate.getFullYear()}-${currentDate.getMonth()}`;
 }
 
 function loadData() {
-  return JSON.parse(localStorage.getItem(getStorageKey(currentDate))) || {};
+  return JSON.parse(localStorage.getItem(storageKey())) || {};
 }
 
 function saveData(data) {
-  localStorage.setItem(getStorageKey(currentDate), JSON.stringify(data));
+  localStorage.setItem(storageKey(), JSON.stringify(data));
 }
 
 function renderCalendar() {
@@ -32,55 +35,74 @@ function renderCalendar() {
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
-  monthLabel.textContent = currentDate.toLocaleString("default", { month: "long", year: "numeric" });
+  monthLabel.textContent = currentDate.toLocaleString("default", {
+    month: "long",
+    year: "numeric"
+  });
 
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  let inOffice = 0;
+  let possibleDays = 0;
 
   for (let i = 0; i < firstDay; i++) {
     calendarEl.appendChild(document.createElement("div"));
   }
 
-  let inOffice = 0;
-  let possibleDays = 0;
-
   for (let day = 1; day <= daysInMonth; day++) {
-    const dateStr = `${year}-${month + 1}-${day}`;
-    const state = data[dateStr];
-    const dateObj = new Date(year, month, day);
+    const date = new Date(year, month, day);
+    const dateKey = `${year}-${month + 1}-${day}`;
+    const state = data[dateKey] || "";
 
     const div = document.createElement("div");
     div.className = "day";
 
-    if (dateObj.getDay() === 0 || dateObj.getDay() === 6) {
+    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+    if (isWeekend) {
       div.classList.add("weekend");
-    } else {
-      possibleDays++;
+      div.innerHTML = `<strong>${day}</strong>`;
+      calendarEl.appendChild(div);
+      continue;
     }
+
+    possibleDays++;
 
     if (state) {
       div.classList.add(state);
-      div.innerHTML = `<strong>${day}</strong><label>${STATE_LABELS[state]}</label>`;
-
       if (state === "office") inOffice++;
       if (state === "pto" || state === "wfa") possibleDays--;
-    } else {
-      div.innerHTML = `<strong>${day}</strong>`;
     }
 
-    div.onclick = () => {
-      const currentIndex = STATES.indexOf(state);
-      const nextState = STATES[(currentIndex + 1) % STATES.length];
-      data[dateStr] = nextState;
+    const select = document.createElement("select");
+    select.innerHTML = `
+      <option value="">—</option>
+      <option value="office">In Office</option>
+      <option value="wfh">WFH</option>
+      <option value="pto">PTO</option>
+      <option value="wfa">WFA</option>
+    `;
+    select.value = state;
+
+    select.onchange = () => {
+      data[dateKey] = select.value;
       saveData(data);
       renderCalendar();
     };
 
+    div.innerHTML = `<strong>${day}</strong>`;
+    div.appendChild(select);
     calendarEl.appendChild(div);
   }
 
+  const targetOfficeDays =
+    Math.ceil((possibleDays / 5) * WEEKLY_TARGET);
+
+  const daysNeeded = Math.max(targetOfficeDays - inOffice, 0);
+
   inOfficeCountEl.textContent = inOffice;
   possibleDaysEl.textContent = possibleDays;
+  daysNeededEl.textContent = daysNeeded;
   attendanceScoreEl.textContent =
     possibleDays > 0 ? ((inOffice / possibleDays) * 5).toFixed(2) : "0";
 }
