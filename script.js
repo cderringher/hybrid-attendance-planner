@@ -1,6 +1,5 @@
 
-onsole.log("✅ script.js loaded");
-alert("✅ script.js loaded");
+alert("✅ script.js is running");
 
 const calendarEl = document.getElementById("calendar");
 const monthLabel = document.getElementById("monthLabel");
