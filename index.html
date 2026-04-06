@@ -2,27 +2,37 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hybrid Attendance Planner</title>
 
-  <link rel="stylesheet" href="./stylesbrid Attendance Planner</h1>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
 
-  <div>
-    <button id="prevMonth">◀</button>
-    <span id="monthLabel"></span>
-    <button id="nextMonth">▶</button>
-  </div>
+  <header>
+    <h1>Hybrid Attendance Planner</h1>
 
-  <div class="summary">
-    <div>In Office: <span id="inOfficeCount">0</span></div>
-    <div>Possible Days: <span id="possibleDays">0</span></div>
-    <div>Days Needed to Hit Target: <span id="daysNeeded">0</span></div>
-    <div>Attendance Score: <span id="attendanceScore">0</span></div>
-  </div>
+    <div class="controls">
+      <button id="prevMonth">◀</button>
+      <h2 id="monthLabel"></h2>
+      <button id="nextMonth">▶</button>
+    </div>
+  </header>
 
-  <div id="calendar"></div>
+  <section class="summary">
+    <div><strong>In Office:</strong> <span id="inOfficeCount">0</span></div>
+    <div><strong>Possible Days:</strong> <span id="possibleDays">0</span></div>
+    <div><strong>Days Needed to Hit Target:</strong> <span id="daysNeeded">0</span></div>
+    <div><strong>Attendance Score:</strong> <span id="attendanceScore">0</span></div>
+  </section>
 
-  <!-- ✅ THIS LINE IS THE MOST IMPORTANT LINE IN THE ENTIRE APP -->
-  ./script.js</script>
+  <section class="calendar" id="calendar"></section>
+
+  <footer>
+    <p>Select a value for each weekday. Weekends are excluded automatically.</p>
+  </footer>
+
+  <!-- ✅ THIS MUST BE A REAL SCRIPT TAG (not plain text) -->
+  <script src="./script.js"></script>
 </body>
 </html>
-``
