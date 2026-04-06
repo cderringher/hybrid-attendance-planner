@@ -7,15 +7,14 @@ const daysNeededEl = document.getElementById("daysNeeded");
 
 let currentDate = new Date();
 
-const STATES = ["office", "wfh", "pto", "wfa"];
+const WEEKLY_TARGET = 3;
+
 const LABELS = {
   office: "In Office",
   wfh: "WFH",
   pto: "PTO",
   wfa: "WFA"
 };
-
-const WEEKLY_TARGET = 3;
 
 function storageKey() {
   return `attendance-${currentDate.getFullYear()}-${currentDate.getMonth()}`;
@@ -35,30 +34,31 @@ function renderCalendar() {
 
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
+
   monthLabel.textContent = currentDate.toLocaleString("default", {
     month: "long",
     year: "numeric"
   });
 
-  const firstDay = new Date(year, month, 1).getDay();
+  const firstDayOfMonth = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
   let inOffice = 0;
-  let possibleDays = 0;
+  let totalPossibleWeekdays = 0;
 
-  for (let i = 0; i < firstDay; i++) {
+  // spacer cells before first weekday
+  for (let i = 0; i < firstDayOfMonth; i++) {
     calendarEl.appendChild(document.createElement("div"));
   }
 
   for (let day = 1; day <= daysInMonth; day++) {
     const date = new Date(year, month, day);
     const dateKey = `${year}-${month + 1}-${day}`;
-    const state = data[dateKey] || "";
+    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
 
     const div = document.createElement("div");
     div.className = "day";
 
-    const isWeekend = date.getDay() === 0 || date.getDay() === 6;
     if (isWeekend) {
       div.classList.add("weekend");
       div.innerHTML = `<strong>${day}</strong>`;
@@ -66,17 +66,24 @@ function renderCalendar() {
       continue;
     }
 
-    possibleDays++;
+    // Weekday
+    totalPossibleWeekdays++;
 
-    if (state) {
+    // DEFAULT VALUE = WFH
+    const state = data[dateKey] || "wfh";
+
+    // Count in-office
+    if (state === "office") {
+      inOffice++;
+    }
+
+    // Style only non-default states
+    if (state !== "wfh") {
       div.classList.add(state);
-      if (state === "office") inOffice++;
-      if (state === "pto" || state === "wfa") possibleDays--;
     }
 
     const select = document.createElement("select");
     select.innerHTML = `
-      <option value="">—</option>
       <option value="office">In Office</option>
       <option value="wfh">WFH</option>
       <option value="pto">PTO</option>
@@ -95,16 +102,21 @@ function renderCalendar() {
     calendarEl.appendChild(div);
   }
 
-  const targetOfficeDays =
-    Math.ceil((possibleDays / 5) * WEEKLY_TARGET);
+  // monthly target based on total weekdays
+  const monthlyTargetDays = Math.ceil(
+    (totalPossibleWeekdays / 5) * WEEKLY_TARGET
+  );
 
-  const daysNeeded = Math.max(targetOfficeDays - inOffice, 0);
+  const daysNeeded = Math.max(monthlyTargetDays - inOffice, 0);
 
   inOfficeCountEl.textContent = inOffice;
-  possibleDaysEl.textContent = possibleDays;
+  possibleDaysEl.textContent = totalPossibleWeekdays;
   daysNeededEl.textContent = daysNeeded;
+
   attendanceScoreEl.textContent =
-    possibleDays > 0 ? ((inOffice / possibleDays) * 5).toFixed(2) : "0";
+    totalPossibleWeekdays > 0
+      ? ((inOffice / totalPossibleWeekdays) * 5).toFixed(2)
+      : "0";
 }
 
 document.getElementById("prevMonth").onclick = () => {
