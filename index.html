@@ -3,32 +3,35 @@
 <head>
   <meta charset="UTF-8" />
   <title>Hybrid Attendance Planner</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
 
-<header>
-  <h1>Hybrid Attendance Planner</h1>
-  <div class="controls">
-    <button id="prevMonth">◀</button>
-    <h2 id="monthLabel"></h2>
-    <button id="nextMonth">▶</button>
-  </div>
-</header>
+  <!-- ✅ Load CSS correctly -->
+  <link rel="stylesheet"dy>
 
-<section class="summary">
-  <div><strong>In Office:</strong> <span id="inOfficeCount">0</span></div>
-  <div><strong>Possible Days:</strong> <span id="possibleDays">0</span></div>
-  <div><strong>Days Needed to Hit Target:</strong> <span id="daysNeeded">0</span></div>
-  <div><strong>Attendance Score:</strong> <span id="attendanceScore">0</span></div>
-</section>
+  <header>
+    <h1>Hybrid Attendance Planner</h1>
 
-<section class="calendar" id="calendar"></section>
+    <div class="controls">
+      <button id="prevMonth">◀</button>
+      <h2 id="monthLabel"></h2>
+      <button id="nextMonth">▶</button>
+    </div>
+  </header>
 
-<footer>
-  <p>Select a value for each weekday. Weekends are excluded automatically.</p>
-</footer>
+  <section class="summary">
+    <div><strong>In Office:</strong> <span id="inOfficeCount">0</span></div>
+    <div><strong>Possible Days:</strong> <span id="possibleDays">0</span></div>
+    <div><strong>Days Needed to Hit Target:</strong> <span id="daysNeeded">0</span></div>
+    <div><strong>Attendance Score:</strong> <span id="attendanceScore">0</span></div>
+  </section>
 
-<script src="script.js"></script>
+  <!-- ✅ Calendar container -->
+  <section class="calendar" id="calendar"></section>
+
+  <footer>
+    <p>Select a value for each weekday. Weekends are excluded automatically.</p>
+  </footer>
+
+  <!-- ✅ Load JS correctly (very important this is AFTER HTML) -->
+  <scriptjs</script>
 </body>
 </html>
